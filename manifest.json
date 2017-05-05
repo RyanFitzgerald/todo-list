@@ -1,0 +1,31 @@
+{
+    "manifest_version": 2,
+    "name": "To-Do Lists",
+    "short_name": "To-Do Lists",
+    "version": "3.0.1",
+    "description": "To-Do Lists Made Simple",
+    "icons": {
+        "16": "images/icon16.png",
+        "48": "images/icon48.png",
+        "128": "images/icon128.png"
+    },
+    "browser_action": {
+        "default_icon": {
+            "19": "images/icon19.png",
+            "38": "images/icon38.png"
+        },
+        "default_title": "Open To-Do List",
+        "default_popup": "index.html"
+    },
+    "background": {
+        "persistent": false,
+        "scripts": ["js/background.js"]
+    },
+    "author": "Ryan Fitzgerald",
+    "incognito": "split",
+    "offline_enabled": true,
+    "permissions": [
+        "activeTab",
+        "storage"
+    ]
+}

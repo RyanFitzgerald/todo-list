@@ -1,0 +1,20 @@
+{
+  "name": "todo-list",
+  "version": "1.0.0",
+  "description": "To-do Lists Made Simple",
+  "main": "js/scripts.js",
+  "author": "Ryan Fitzgerald",
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^3.19.0",
+    "gulp": "^3.9.1",
+    "gulp-autoprefixer": "^3.1.1",
+    "gulp-babel": "^6.1.2",
+    "gulp-concat": "^2.6.0",
+    "gulp-livereload": "^3.8.1",
+    "gulp-plumber": "^1.1.0",
+    "gulp-rename": "^1.2.2",
+    "gulp-sass": "^2.3.2",
+    "gulp-uglify": "^2.0.0"
+  }
+}
