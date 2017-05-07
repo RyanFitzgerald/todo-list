@@ -14,7 +14,7 @@
   padding: 0;
   font-size: 20px;
   background: none;
-  color: #3498db; }
+  color: #00aeef; }
   #todo-input-icon:focus {
     outline: none; }
   #todo-input-icon i {
@@ -39,7 +39,7 @@
   width: 50px;
   font-size: 16px;
   background: none;
-  color: #3498db;
+  color: #00aeef;
   border: none;
   font-weight: 700;
   cursor: pointer;
@@ -54,54 +54,106 @@
   padding: 0; }
 
 .todo-item {
-  padding: 5px 10px;
-  border-top: 1px solid #eee;
-  transition: 0.5s ease all;
+  position: relative;
+  border-top: 1px solid #e2dede;
   list-style: none;
   cursor: move; }
-  .todo-item.completed {
+  .todo-item:hover .todo-item-edit, .todo-item:hover .todo-item-delete {
+    display: inline-block; }
+
+.todo-item-wrap {
+  position: relative;
+  transition: 0.5s ease all;
+  z-index: 10;
+  padding: 5px 10px;
+  background: #fff;
+  transition: 0.5s ease all; }
+  .todo-item-wrap.slide {
     -webkit-transform: translateX(100%);
             transform: translateX(100%); }
-  .todo-item.deleted {
-    -webkit-transform: translateX(-100%);
-            transform: translateX(-100%); }
-  .todo-item:hover {
+  .todo-item-wrap:hover {
     background: #f3f3f3; }
-    .todo-item:hover .todo-item-edit, .todo-item:hover .todo-item-delete {
+  .todo-item-wrap.active {
+    background: #f3f3f3; }
+    .todo-item-wrap.active .todo-item-edit {
+      display: inline-block; }
+      .todo-item-wrap.active .todo-item-edit span {
+        color: #f1c40f; }
+    .todo-item-wrap.active .todo-item-delete {
       display: inline-block; }
 
-.todo-item-done {
+.todo-item-complete {
   display: inline-block;
   vertical-align: middle;
   width: 25px;
   padding: 10px 0; }
-  .todo-item-done span {
+  .todo-item-complete span {
     display: block;
     width: 25px;
     height: 25px;
-    border: 2px solid #3498db;
+    border: 2px solid #00aeef;
     border-radius: 50%;
     transition: 0.5s ease all;
     cursor: pointer; }
-    .todo-item-done span i {
+    .todo-item-complete span i {
       opacity: 0;
       color: #fff;
       font-size: 15px;
       margin-left: 3px;
       margin-top: 3px; }
-    .todo-item-done span:hover {
-      background: #3498db; }
-      .todo-item-done span:hover i {
+    .todo-item-complete span:hover {
+      background: #00aeef; }
+      .todo-item-complete span:hover i {
         opacity: 1; }
+
+.todo-item-completed {
+  position: absolute;
+  display: none;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  text-align: center;
+  background: #2ecc71;
+  z-index: 1; }
+  .todo-item-completed span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    color: #fff;
+    -webkit-transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%); }
+  .todo-item-completed.active {
+    display: block; }
 
 .todo-item-content {
   display: inline-block;
   vertical-align: middle;
-  width: 260px;
+  width: 253px;
   padding: 10px;
   font-size: 16px;
   font-weight: 500;
   color: #77777f; }
+  .todo-item-content.inactive {
+    display: none; }
+
+.todo-item-content-edit {
+  display: none;
+  vertical-align: middle;
+  width: 253px;
+  padding: 5px; }
+  .todo-item-content-edit input {
+    background: none;
+    width: 100%;
+    border: none;
+    padding: 5px;
+    border-bottom: 1px solid #00aeef; }
+    .todo-item-content-edit input:focus {
+      outline: none; }
+  .todo-item-content-edit.active {
+    display: inline-block; }
 
 .todo-item-edit {
   display: none;
@@ -117,6 +169,8 @@
     color: #d2d2d2;
     cursor: pointer; }
     .todo-item-edit span:hover {
+      color: #f1c40f; }
+    .todo-item-edit span.active {
       color: #f1c40f; }
 
 .todo-item-delete {
@@ -134,3 +188,25 @@
     cursor: pointer; }
     .todo-item-delete span:hover {
       color: #e74c3c; }
+
+.todo-item-deleted {
+  position: absolute;
+  display: none;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  text-align: center;
+  background: #e74c3c;
+  z-index: 1; }
+  .todo-item-deleted span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    color: #fff;
+    -webkit-transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%); }
+  .todo-item-deleted.active {
+    display: block; }

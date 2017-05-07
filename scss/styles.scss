@@ -1,3 +1,5 @@
+$main-colour: #00aeef;
+
 * {
     box-sizing: border-box;
 }
@@ -16,7 +18,7 @@
     padding: 0;
     font-size: 20px;
     background: none;
-    color: #3498db;
+    color: $main-colour;
 
     &:focus {
         outline: none;
@@ -50,7 +52,7 @@
     width: 50px;
     font-size: 16px;
     background: none;
-    color: #3498db;
+    color: $main-colour;
     border: none;
     font-weight: 700;
     cursor: pointer;
@@ -68,30 +70,52 @@
 }
 
 .todo-item {
-    padding: 5px 10px;
-    border-top: 1px solid #eee;
-    transition: 0.5s ease all;
+    position: relative;
+    border-top: 1px solid #e2dede;
     list-style: none;
     cursor: move;
 
-    &.completed {
-        transform: translateX(100%);
-    }
-
-    &.deleted {
-        transform: translateX(-100%);
-    }
-
     &:hover {
-        background: #f3f3f3;
-
         .todo-item-edit, .todo-item-delete {
             display: inline-block;
         }
     }
 }
 
-.todo-item-done {
+.todo-item-wrap {
+    position: relative;
+    transition: 0.5s ease all;
+    z-index: 10;
+    padding: 5px 10px;
+    background: #fff;
+    transition: 0.5s ease all;
+
+    &.slide {
+        transform: translateX(100%);
+    }
+
+    &:hover {
+        background: #f3f3f3;
+    }
+
+    &.active {
+        background: #f3f3f3;
+
+        .todo-item-edit {
+            display: inline-block;
+
+            span {
+                color: #f1c40f;
+            }
+        }
+
+        .todo-item-delete {
+            display: inline-block;
+        }
+    }
+}
+
+.todo-item-complete {
     display: inline-block;
     vertical-align: middle;
     width: 25px;
@@ -101,7 +125,7 @@
         display: block;
         width: 25px;
         height: 25px;
-        border: 2px solid #3498db;
+        border: 2px solid $main-colour;
         border-radius: 50%;
         transition: 0.5s ease all;
         cursor: pointer;
@@ -115,7 +139,7 @@
         }
 
         &:hover {
-            background: #3498db;
+            background: $main-colour;
 
             i {
                 opacity: 1;
@@ -124,14 +148,67 @@
     }
 }
 
+.todo-item-completed {
+    position: absolute;
+    display: none;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    text-align: center;
+    background: #2ecc71;
+    z-index: 1;
+
+    span {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        color: #fff;
+        transform: translate(-50%, -50%);
+    }
+
+    &.active {
+        display: block;
+    }
+}
+
 .todo-item-content {
     display: inline-block;
     vertical-align: middle;
-    width: 260px;
+    width: 253px;
     padding: 10px;
     font-size: 16px;
     font-weight: 500;
     color: #77777f;
+
+    &.inactive {
+        display: none;
+    }
+}
+
+.todo-item-content-edit {
+    display: none;
+    vertical-align: middle;
+    width: 253px;
+    padding: 5px;
+
+    input {
+        background: none;
+        width: 100%;
+        border: none;
+        padding: 5px;
+        border-bottom: 1px solid $main-colour;
+
+        &:focus {
+            outline: none;
+        }
+    }
+
+    &.active {
+        display: inline-block;
+    }
 }
 
 .todo-item-edit {
@@ -150,6 +227,10 @@
         cursor: pointer;
 
         &:hover {
+            color: #f1c40f;
+        }
+
+        &.active {
             color: #f1c40f;
         }
     }
@@ -173,5 +254,31 @@
         &:hover {
             color: #e74c3c;
         }
+    }
+}
+
+.todo-item-deleted {
+    position: absolute;
+    display: none;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    text-align: center;
+    background: #e74c3c;
+    z-index: 1;
+
+    span {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        color: #fff;
+        transform: translate(-50%, -50%);
+    }
+
+    &.active {
+        display: block;
     }
 }

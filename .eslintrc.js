@@ -6,6 +6,11 @@ module.exports = {
     "commonjs": true,
     "node": true
   },
+  "globals": {
+    "chrome": true,
+    "moment": true,
+    "Sortable": true
+  },
   "extends": ["eslint:recommended"],
   "rules": {
     "indent": ["error", 4],
