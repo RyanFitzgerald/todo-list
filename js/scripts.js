@@ -3,6 +3,8 @@
     const inputField = document.getElementById('todo-input-field');
     const inputSubmit = document.getElementById('todo-input-submit');
     const list = document.getElementById('todo-list');
+    const summary = document.getElementById('todo-summary');
+    const summaryToggle = document.getElementById('todo-summary-toggle');
 
     // Define Variables
     let listItems = {};
@@ -32,8 +34,14 @@
                 <div class="todo-item-complete"><span><i class="fa fa-check" aria-hidden="true"></i></span></div>
                 <div class="todo-item-content">${val}</div>
                 <div class="todo-item-content-edit"><input type="text" class="todo-item-edit-field"></div>
-                <div class="todo-item-edit"><span><i class="fa fa-pencil" aria-hidden="true"></i></span></div>
-                <div class="todo-item-delete"><span><i class="fa fa-times" aria-hidden="true"></i></span></div>
+                <div class="todo-item-edit-options">
+                    <div class="todo-item-edit-confirm"><span><i class="fa fa-check" aria-hidden="true"></i></span></div>
+                    <div class="todo-item-edit-cancel"><span><i class="fa fa-times" aria-hidden="true"></i></span></div>
+                </div>
+                <div class="todo-item-options">
+                    <div class="todo-item-edit"><span><i class="fa fa-pencil" aria-hidden="true"></i></span></div>
+                    <div class="todo-item-delete"><span><i class="fa fa-trash-o" aria-hidden="true"></i></span></div>
+                </div>
             </div>
             <div class="todo-item-completed"><span>Completed!</span></div>
             <div class="todo-item-deleted"><span>Deleted!</span></div>
@@ -42,8 +50,10 @@
 
         // Create necessary event listeners
         completeListener(todo.getElementsByClassName('todo-item-complete')[0]);
-        editFieldListener(todo.getElementsByClassName('todo-item-edit-field')[0]);
         editListener(todo.getElementsByClassName('todo-item-edit')[0]);
+        editFieldListener(todo.getElementsByClassName('todo-item-edit-field')[0]);
+        editConfirmListener(todo.getElementsByClassName('todo-item-edit-confirm')[0]);
+        editCancelListener(todo.getElementsByClassName('todo-item-edit-cancel')[0]);
         deleteListener(todo.getElementsByClassName('todo-item-delete')[0]);
 
         // Clear the form
@@ -84,13 +94,14 @@
      * @param {object} field - Edit to do title field
      */
     const editFieldListener = field => {
+        let wrap = field.parentNode.parentNode;
         field.addEventListener('keyup', e => {
             if (e.keyCode === 13) {
                 if (field.value === '') return;
-                field.parentNode.parentNode.getElementsByClassName('todo-item-content')[0].innerHTML = field.value;
-                field.parentNode.parentNode.getElementsByClassName('todo-item-content')[0].classList.remove('inactive');
-                field.parentNode.parentNode.getElementsByClassName('todo-item-content-edit')[0].classList.remove('active');
-                field.parentNode.parentNode.classList.remove('active');
+                wrap.getElementsByClassName('todo-item-content')[0].innerHTML = field.value;
+                wrap.getElementsByClassName('todo-item-content')[0].classList.remove('inactive');
+                wrap.getElementsByClassName('todo-item-content-edit')[0].classList.remove('active');
+                wrap.classList.remove('active');
 
                 // Reset IDs and save
                 setListIDs();
@@ -104,19 +115,48 @@
      * @param {object} btn - Edit button
      */
     const editListener = btn => {
+        let wrap = btn.parentNode.parentNode;
         btn.addEventListener('click', () => {
-            if (!btn.parentNode.getElementsByClassName('todo-item-content')[0].classList.contains('inactive')) {
-                btn.parentNode.getElementsByClassName('todo-item-content')[0].classList.add('inactive');
-                btn.parentNode.getElementsByClassName('todo-item-edit-field')[0].value = btn.parentNode.getElementsByClassName('todo-item-content')[0].innerHTML;
-                btn.parentNode.getElementsByClassName('todo-item-content-edit')[0].classList.add('active');
-                btn.parentNode.getElementsByClassName('todo-item-edit-field')[0].select();
-                btn.parentNode.classList.add('active');
-            } else {
-                btn.parentNode.getElementsByClassName('todo-item-content')[0].classList.remove('inactive');
-                btn.parentNode.getElementsByClassName('todo-item-content-edit')[0].classList.remove('active');
-                btn.parentNode.getElementsByClassName('todo-item-edit')[0].getElementsByTagName('span')[0].classList.remove('active');
-                btn.parentNode.classList.remove('active');
-            }
+            wrap.getElementsByClassName('todo-item-content')[0].classList.add('inactive');
+            wrap.getElementsByClassName('todo-item-edit-field')[0].value = wrap.getElementsByClassName('todo-item-content')[0].innerHTML;
+            wrap.getElementsByClassName('todo-item-content-edit')[0].classList.add('active');
+            wrap.getElementsByClassName('todo-item-edit-field')[0].select();
+            wrap.classList.add('active');
+        });
+    };
+
+    /**
+     * Adds event listener for edit task button
+     * @private
+     * @param {object} btn - Edit Confirm button
+     */
+    const editConfirmListener = btn => {
+        let wrap = btn.parentNode.parentNode;
+        let field = wrap.getElementsByClassName('todo-item-edit-field')[0];
+        btn.addEventListener('click', () => {
+            if (field.value === '') return;
+            wrap.getElementsByClassName('todo-item-content')[0].innerHTML = field.value;
+            wrap.getElementsByClassName('todo-item-content')[0].classList.remove('inactive');
+            wrap.getElementsByClassName('todo-item-content-edit')[0].classList.remove('active');
+            wrap.classList.remove('active');
+
+            // Reset IDs and save
+            setListIDs();
+        });
+    };
+
+    /**
+     * Adds event listener for edit task button
+     * @private
+     * @param {object} btn - Edit Cancel button
+     */
+    const editCancelListener = btn => {
+        let wrap = btn.parentNode.parentNode;
+        btn.addEventListener('click', () => {
+            wrap.getElementsByClassName('todo-item-content')[0].classList.remove('inactive');
+            wrap.getElementsByClassName('todo-item-content-edit')[0].classList.remove('active');
+            wrap.getElementsByClassName('todo-item-edit')[0].getElementsByTagName('span')[0].classList.remove('active');
+            wrap.classList.remove('active');
         });
     };
 
@@ -126,12 +166,14 @@
      * @param {object} btn - Delete button
      */
     const deleteListener = btn => {
+        let item = btn.parentNode.parentNode.parentNode;
+        let wrap = btn.parentNode.parentNode;
         btn.addEventListener('click', () => {
-            btn.parentNode.parentNode.getElementsByClassName('todo-item-deleted')[0].height = btn.parentNode.parentNode.height;
-            btn.parentNode.parentNode.getElementsByClassName('todo-item-deleted')[0].classList.add('active');
-            btn.parentNode.classList.add('slide');
+            item.getElementsByClassName('todo-item-deleted')[0].height = item.clientHeight;
+            item.getElementsByClassName('todo-item-deleted')[0].classList.add('active');
+            wrap.classList.add('slide');
             setTimeout(() => {
-                btn.parentNode.parentNode.remove();
+                item.remove();
                 setListIDs();
             }, 750);
         });
@@ -230,6 +272,15 @@
             // If empty, return
             if (inputField.value === '') return;
             addTodo(inputField.value, moment().format('YYYY-MM-DD'), document.getElementsByClassName('todo-item').length + 1);
+        });
+
+        // Add event listener for toggling summary
+        summaryToggle.addEventListener('click', () => {
+            if (summary.classList.contains('active')) {
+                summary.classList.remove('active');
+            } else {
+                summary.classList.add('active');
+            }
         });
     };
 
