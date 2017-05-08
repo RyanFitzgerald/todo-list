@@ -5,9 +5,33 @@
     const list = document.getElementById('todo-list');
     const summary = document.getElementById('todo-summary');
     const summaryToggle = document.getElementById('todo-summary-toggle');
+    const daySummary = document.getElementById('todo-summary-day');
+    const weekSummary = document.getElementById('todo-summary-week');
+    const monthSummary = document.getElementById('todo-summary-month');
+    const yearSummary = document.getElementById('todo-summary-year');
+    const allSummary = document.getElementById('todo-summary-all');
 
     // Define Variables
     let listItems = {};
+    let summaryObj = {
+        daySummary: {
+            count: 0,
+            date: null
+        },
+        weekSummary: {
+            count: 0,
+            date: null
+        },
+        monthSummary: {
+            count: 0,
+            date: null
+        },
+        yearSummary: {
+            count: 0,
+            date: null
+        },
+        allSummary: 0
+    };
 
     /**
      * Initialize sortable and call reorder function on end
@@ -84,6 +108,13 @@
             wrap.classList.add('slide');
             setTimeout(() => {
                 item.remove();
+                summaryObj.daySummary.count++;
+                summaryObj.weekSummary.count++;
+                summaryObj.monthSummary.count++;
+                summaryObj.yearSummary.count++;
+                summaryObj.allSummary++;
+                updateSummary();
+                setListIDs();
             }, 750);
         });
     };
@@ -188,6 +219,18 @@
     };
 
     /**
+     * Updates the summary numbers
+     * @private
+     */
+    const updateSummary = () => {
+        daySummary.innerHTML = summaryObj.daySummary.count;
+        weekSummary.innerHTML = summaryObj.weekSummary.count;
+        monthSummary.innerHTML = summaryObj.monthSummary.count;
+        yearSummary.innerHTML = summaryObj.yearSummary.count;
+        allSummary.innerHTML = summaryObj.allSummary;
+    };
+
+    /**
      * Saves the current list to-dos
      * @private
      */
@@ -214,6 +257,9 @@
 
         // Save list
         saveList();
+
+        // Save summary
+        saveSummary();
     };
 
     /**
@@ -251,12 +297,88 @@
     };
 
     /**
+     * Saves summary
+     * @private
+     */
+    const saveSummary = () => {
+        chrome.storage.sync.remove('summary', function() {
+            chrome.storage.sync.set({
+                'summary': summaryObj
+            }, function() {
+                console.log('Summary updated.');
+            });
+        });
+    };
+
+    /**
+     * Loads and sets up summary
+     * @private
+     */
+    const loadSummary = () => {
+        chrome.storage.sync.get('summary', function(data) {
+            // Check if summary object currently exists
+            if (typeof(data.summary) === 'undefined') {
+                // Save summary
+                saveSummary();
+                return;
+            }
+
+            // Store summary Object
+            summaryObj = data.summary;
+
+            // Check summary and reset as needed
+            checkSummary();
+
+            // Update summary items
+            updateSummary();
+
+            // Save summary
+            saveSummary();
+        });
+    };
+
+    /**
+     * Checks the current summary items
+     * @private
+     */
+    const checkSummary = () => {
+        let current = moment();
+
+        // Check if new day
+        if (current.format('YYYY-MM-DD') !== summaryObj.daySummary.date) {
+            summaryObj.daySummary.count = 0;
+            summaryObj.daySummary.date = current.format('YYYY-MM-DD');
+        }
+
+        // Check if new week
+        if (current.week() !== moment(summaryObj.weekSummary.date).week()) {
+            summaryObj.weekSummary.count = 0;
+            summaryObj.weekSummary.date = current.format('YYYY-MM-DD');
+        }
+
+        // Check if new month
+        if (current.month() !== moment(summaryObj.monthSummary.date).month()) {
+            summaryObj.monthSummary.count = 0;
+            summaryObj.monthSummary.date = current.format('YYYY-MM-DD');
+        }
+
+        // Check if new year
+        if (current.year() !== moment(summaryObj.yearSummary.date).year()) {
+            summaryObj.yearSummary.count = 0;
+            summaryObj.yearSummary.date = current.format('YYYY-MM-DD');
+        }
+    };
+
+    /**
      * Initializes the to-do functionality
      * @private
      */
     const init = () => {
         // Load list
         loadList();
+
+        // Setup summary
+        loadSummary();
 
         // Add event listener for enter submit on form
         inputField.addEventListener('keyup', e => {
