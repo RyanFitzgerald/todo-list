@@ -257,7 +257,7 @@
     -webkit-transform: rotate(180deg);
             transform: rotate(180deg); }
   #todo-summary.active #todo-summary-content {
-    height: 120px; }
+    display: block; }
 
 #todo-summary-toggle {
   cursor: pointer;
@@ -274,23 +274,16 @@
 
 #todo-summary-content {
   position: relative;
-  height: 0;
-  overflow: hidden;
-  text-align: center; }
+  display: none; }
 
-.todo-summary-section {
-  float: left;
-  width: 33.33%;
-  padding: 10px 5px;
-  border: 1px solid #e4e3e3; }
-  .todo-summary-section h2 {
-    margin: 0;
-    font-weight: 400; }
-  .todo-summary-section h3 {
-    margin: 5px 0 0 0;
-    font-weight: 400;
-    font-size: 12px; }
+#todo-list-complete {
+  margin: 0;
+  padding: 0; }
 
-.bottom-section {
-  width: 50%;
-  border-top: none; }
+.completed {
+  opacity: 0.75; }
+  .completed .todo-item-complete span {
+    border: 2px solid #77777f;
+    background: #77777f; }
+    .completed .todo-item-complete span i {
+      opacity: 1; }

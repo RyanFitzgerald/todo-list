@@ -3,34 +3,14 @@
     const inputField = document.getElementById('todo-input-field');
     const inputSubmit = document.getElementById('todo-input-submit');
     const list = document.getElementById('todo-list');
+    const completedList = document.getElementById('todo-list-complete');
     const summary = document.getElementById('todo-summary');
     const summaryToggle = document.getElementById('todo-summary-toggle');
-    const daySummary = document.getElementById('todo-summary-day');
-    const weekSummary = document.getElementById('todo-summary-week');
-    const monthSummary = document.getElementById('todo-summary-month');
-    const yearSummary = document.getElementById('todo-summary-year');
-    const allSummary = document.getElementById('todo-summary-all');
 
     // Define Variables
-    let listItems = {};
-    let summaryObj = {
-        daySummary: {
-            count: 0,
-            date: null
-        },
-        weekSummary: {
-            count: 0,
-            date: null
-        },
-        monthSummary: {
-            count: 0,
-            date: null
-        },
-        yearSummary: {
-            count: 0,
-            date: null
-        },
-        allSummary: 0
+    let listItems = {
+        incomplete: {},
+        complete: {}
     };
 
     /**
@@ -47,12 +27,12 @@
      * Adds to do item to the list
      * @private
      */
-    const addTodo = (val, created, itemID) => {
+    const addTodo = (val, created, itemID, completedOn = false) => {
         // Create the todo item
         let todo = document.createElement('li');
         todo.setAttribute('class', 'todo-item');
-        todo.setAttribute('id', `todo-${itemID}`);
         todo.dataset.createdOn = created;
+        todo.dataset.completedOn = completedOn;
         todo.innerHTML = `
             <div class="todo-item-wrap">
                 <div class="todo-item-complete"><span><i class="fa fa-check" aria-hidden="true"></i></span></div>
@@ -70,7 +50,6 @@
             <div class="todo-item-completed"><span>Completed!</span></div>
             <div class="todo-item-deleted"><span>Deleted!</span></div>
         `;
-        list.append(todo);
 
         // Create necessary event listeners
         completeListener(todo.getElementsByClassName('todo-item-complete')[0]);
@@ -83,11 +62,26 @@
         // Clear the form
         clearForm();
 
-        // Add to list items
-        listItems[itemID] = {
-            'todo': val,
-            'created': created
-        };
+        if (!completedOn) {
+            list.append(todo);
+            todo.setAttribute('id', `todo-${itemID}`);
+            // Add to list items
+            listItems.incomplete[itemID] = {
+                'todo': val,
+                'created': created,
+                'completed': completedOn
+            };
+        } else {
+            completedList.append(todo);
+            todo.classList.add('completed');
+            todo.setAttribute('id', `todocomplete-${itemID}`);
+            // Add to list items
+            listItems.complete[itemID] = {
+                'todo': val,
+                'created': created,
+                'completed': completedOn
+            };
+        }
 
         // Save list
         saveList();
@@ -102,20 +96,22 @@
         let item = btn.parentNode.parentNode;
         let wrap = btn.parentNode;
         let completed = item.getElementsByClassName('todo-item-completed')[0];
+        let isCompleted = (item.dataset.completedOn !== 'false');
         btn.addEventListener('click', () => {
-            completed.height = item.height;
-            completed.classList.add('active');
-            wrap.classList.add('slide');
-            setTimeout(() => {
+            if (isCompleted) {
                 item.remove();
-                summaryObj.daySummary.count++;
-                summaryObj.weekSummary.count++;
-                summaryObj.monthSummary.count++;
-                summaryObj.yearSummary.count++;
-                summaryObj.allSummary++;
-                updateSummary();
+                addTodo(item.getElementsByClassName('todo-item-content')[0].innerHTML, item.dataset.createdOn, item.id.split('-')[1]);
                 setListIDs();
-            }, 750);
+            } else {
+                completed.height = item.height;
+                completed.classList.add('active');
+                wrap.classList.add('slide');
+                setTimeout(() => {
+                    item.remove();
+                    addTodo(item.getElementsByClassName('todo-item-content')[0].innerHTML, item.dataset.createdOn, item.id.split('-')[1], moment().format('YYYY-MM-DD'));
+                    setListIDs();
+                }, 750);
+            }
         });
     };
 
@@ -219,47 +215,52 @@
     };
 
     /**
-     * Updates the summary numbers
-     * @private
-     */
-    const updateSummary = () => {
-        daySummary.innerHTML = summaryObj.daySummary.count;
-        weekSummary.innerHTML = summaryObj.weekSummary.count;
-        monthSummary.innerHTML = summaryObj.monthSummary.count;
-        yearSummary.innerHTML = summaryObj.yearSummary.count;
-        allSummary.innerHTML = summaryObj.allSummary;
-    };
-
-    /**
      * Saves the current list to-dos
      * @private
      */
     const setListIDs = () => {
         // Store all list items
-        let allTodos = document.getElementsByClassName('todo-item');
+        let incompleteTodos = list.getElementsByClassName('todo-item');
+        let completeTodos = completedList.getElementsByClassName('todo-item');
 
         // Empty todo list object
-        listItems = {};
+        listItems = {
+            incomplete: {},
+            complete: {}
+        };
 
-        // If there are items, loop over and adjust IDs
-        if (allTodos.length > 0) {
-            for (let i = 0; i < allTodos.length; i++) {
+        // Loop over any incomplete todos
+        if (incompleteTodos.length > 0) {
+            for (let i = 0; i < incompleteTodos.length; i++) {
                 // Update ID
-                allTodos[i].id = `todo-${i+1}`;
+                incompleteTodos[i].id = `todo-${i+1}`;
 
                 // Add information to listItems object
-                listItems[i+1] = {
-                    'todo': allTodos[i].getElementsByClassName('todo-item-content')[0].innerHTML,
-                    'created': allTodos[i].dataset.createdOn
+                listItems.incomplete[i+1] = {
+                    'todo': incompleteTodos[i].getElementsByClassName('todo-item-content')[0].innerHTML,
+                    'created': incompleteTodos[i].dataset.createdOn,
+                    'completed': incompleteTodos[i].dataset.completedOn
+                };
+            }
+        }
+
+        // Loop over any complete todos
+        if (completeTodos.length > 0) {
+            for (let i = 0; i < completeTodos.length; i++) {
+                // Update ID
+                completeTodos[i].id = `todocomplete-${i+1}`;
+
+                // Add information to listItems object
+                listItems.complete[i+1] = {
+                    'todo': completeTodos[i].getElementsByClassName('todo-item-content')[0].innerHTML,
+                    'created': completeTodos[i].dataset.createdOn,
+                    'completed': completeTodos[i].dataset.completedOn
                 };
             }
         }
 
         // Save list
         saveList();
-
-        // Save summary
-        saveSummary();
     };
 
     /**
@@ -283,90 +284,30 @@
      */
     const loadList = () => {
         chrome.storage.sync.get('list', function(data) {
-            for (let item in data.list) {
+            // Loop through incomplete
+            for (let item in data.list.incomplete) {
                 // skip loop if the property is from prototype
-                if (!data.list.hasOwnProperty(item)) continue;
+                if (!data.list.incomplete.hasOwnProperty(item)) continue;
 
                 // Get current item
-                let currentItem = data.list[item];
+                let currentItem = data.list.incomplete[item];
 
                 // Create the item
                 addTodo(currentItem.todo, currentItem.created, item);
             }
-        });
-    };
 
-    /**
-     * Saves summary
-     * @private
-     */
-    const saveSummary = () => {
-        chrome.storage.sync.remove('summary', function() {
-            chrome.storage.sync.set({
-                'summary': summaryObj
-            }, function() {
-                console.log('Summary updated.');
-            });
-        });
-    };
+            // Loop through complete
+            for (let item in data.list.complete) {
+                // skip loop if the property is from prototype
+                if (!data.list.complete.hasOwnProperty(item)) continue;
 
-    /**
-     * Loads and sets up summary
-     * @private
-     */
-    const loadSummary = () => {
-        chrome.storage.sync.get('summary', function(data) {
-            // Check if summary object currently exists
-            if (typeof(data.summary) === 'undefined') {
-                // Save summary
-                saveSummary();
-                return;
+                // Get current item
+                let currentItem = data.list.complete[item];
+
+                // Create the item
+                addTodo(currentItem.todo, currentItem.created, item, currentItem.completed);
             }
-
-            // Store summary Object
-            summaryObj = data.summary;
-
-            // Check summary and reset as needed
-            checkSummary();
-
-            // Update summary items
-            updateSummary();
-
-            // Save summary
-            saveSummary();
         });
-    };
-
-    /**
-     * Checks the current summary items
-     * @private
-     */
-    const checkSummary = () => {
-        let current = moment();
-
-        // Check if new day
-        if (current.format('YYYY-MM-DD') !== summaryObj.daySummary.date) {
-            summaryObj.daySummary.count = 0;
-            summaryObj.daySummary.date = current.format('YYYY-MM-DD');
-        }
-
-        // Check if new week
-        if (current.week() !== moment(summaryObj.weekSummary.date).week()) {
-            summaryObj.weekSummary.count = 0;
-            summaryObj.weekSummary.date = current.format('YYYY-MM-DD');
-        }
-
-        // Check if new month
-        if (current.month() !== moment(summaryObj.monthSummary.date).month()) {
-            summaryObj.monthSummary.count = 0;
-            summaryObj.monthSummary.date = current.format('YYYY-MM-DD');
-        }
-
-        // Check if new year
-        if (current.year() !== moment(summaryObj.yearSummary.date).year()) {
-            summaryObj.yearSummary.count = 0;
-            summaryObj.yearSummary.date = current.format('YYYY-MM-DD');
-        }
     };
 
     /**
@@ -377,15 +318,12 @@
         // Load list
         loadList();
 
-        // Setup summary
-        loadSummary();
-
         // Add event listener for enter submit on form
         inputField.addEventListener('keyup', e => {
             if (e.keyCode === 13) {
                 // If empty, return
                 if (inputField.value === '') return;
-                addTodo(inputField.value, moment().format('YYYY-MM-DD'), document.getElementsByClassName('todo-item').length + 1);
+                addTodo(inputField.value, moment().format('YYYY-MM-DD'), document.getElementsByClassName('todo-item').length+1);
             }
         });
 
@@ -393,7 +331,7 @@
         inputSubmit.addEventListener('click', () => {
             // If empty, return
             if (inputField.value === '') return;
-            addTodo(inputField.value, moment().format('YYYY-MM-DD'), document.getElementsByClassName('todo-item').length + 1);
+            addTodo(inputField.value, moment().format('YYYY-MM-DD'), document.getElementsByClassName('todo-item').length+1);
         });
 
         // Add event listener for toggling summary
