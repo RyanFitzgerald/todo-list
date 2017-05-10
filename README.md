@@ -1,1 +1,1 @@
-# Taskly - To-Do List
+# To-Do List

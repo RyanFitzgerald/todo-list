@@ -1,6 +1,6 @@
 {
   "name": "todo-list",
-  "version": "1.0.0",
+  "version": "0.9.0",
   "description": "To-do Lists Made Simple",
   "main": "js/scripts.js",
   "author": "Ryan Fitzgerald",

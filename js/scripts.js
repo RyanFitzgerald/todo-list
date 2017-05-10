@@ -2,6 +2,7 @@
     // Store main references
     const inputField = document.getElementById('todo-input-field');
     const inputSubmit = document.getElementById('todo-input-submit');
+    const plus = document.getElementById('todo-input-icon');
     const list = document.getElementById('todo-list');
     const completedList = document.getElementById('todo-list-complete');
     const summary = document.getElementById('todo-summary');
@@ -341,6 +342,11 @@
             } else {
                 summary.classList.add('active');
             }
+        });
+
+        // Add event listener to plus button to trigger field select
+        plus.addEventListener('click', () => {
+            inputField.select();
         });
     };
 
